@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" style="background: var(--bs-dark);">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<title></title>
+</head>
+<body style="background-color: var(--bs-dark);color: var(--bs-white);margin: 40px 0px;">
+<div class="container" style="/*background: var(--bs-gradient);*/">
+<div class="row">
+<div class="col-md-4" style="height: 0px;"><h5 style="color: var(--bs-gray);">NTHM_TETHER (3)</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">NTHM MANUAL</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_TETHER (3)</h5></div>
+</div><div><p></p></div>
+<h6 style="color: #ff5c5c;">NAME</h6>
+<p style="margin: 0px 40px 16px;">
+nthm_tether - start watching a given thread from the current thread
+</p><p style="margin: 0px 40px 16px;">
+nthm_untether - stop watching a given thread from the current thread
+</p>
+<h6 style="color: #ff5c5c;">SYNOPSIS</h6>
+<p style="margin: 0px 40px 16px;">
+#include &lt;nthm/nthm.h&gt;
+</p><p style="margin: 0px 40px 16px;">
+void
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>
+(
+<strong class="font-monospace" style="color: #45b74a;">nthm_pipe</strong>
+<em>source</em>
+, int
+<em>*err</em>
+)
+</p><p style="margin: 0px 40px 16px;">
+void
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>
+(
+<strong class="font-monospace" style="color: #45b74a;">nthm_pipe</strong>
+<em>source</em>
+, int
+<em>*err</em>
+)
+</p>
+<h6 style="color: #ff5c5c;">DESCRIPTION</h6>
+<p style="margin: 0px 40px 16px;">
+Threads managed by the
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>
+library may be envisioned as forming a tree in which some are
+descendents of others.  Whenever an application creates a thread by calling
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>,
+the created thread becomes a descendent of the
+caller's thread. Functions such as
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>,
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>,
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>,
+and
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>
+rely on this relationship to operate on the descendents of the caller's thread
+or to query them.
+</p>
+<p style="margin: 0px 40px 16px;">
+The
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>
+and
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>
+functions allow applications explicit control over this tree.
+Whenever
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>
+is called on a pipe
+<em>source</em>
+whose thread is currently a descendent of the caller's thread, it
+stops being a descendent of the caller's thread, thereafter to be
+ignored by the functions mentioned above.
+</p>
+<p style="margin: 0px 40px 16px;">
+Whereas tethered threads are automatically killed when the thread
+above them in the tree terminates, nothing precludes the pipe of an
+untethered thread being passed via the return value on termination or
+in the input data when a new pipe is opened. Application code running
+in the receiving thread may then call
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>
+to acheive the same effect as having opened it locally.
+</p>
+<h6 style="color: #ff5c5c;">RETURN VALUE</h6>
+<p style="margin: 0px 40px 16px;">
+none
+</p>
+<h6 style="color: #ff5c5c;">ERRORS</h6>
+<p style="margin: 0px 40px 16px;">
+</p>
+<p style="margin: 0px 40px 16px;">
+If
+<em>*err</em>
+is non-zero on entry, then
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>
+and
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>
+leave it unchanged. If
+<em>*err</em>
+is zero on entry and non-zero on exit, it may be assigned one of the
+following values for the reasons noted, and the requested operation
+will not have completed.
+</p>
+<p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_NULPIP</strong></p><p style="margin: 0px 80px 16px;">
+The
+<em>source</em>
+parameter is a NULL pointer.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_INVPIP</strong></p><p style="margin: 0px 80px 16px;">
+The
+<em>source</em>
+parameter is not a NULL pointer but points to an invalid or corrupted
+pipe, or points nowhere in particular but fortunately did not cause a
+segfault.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_NOTDRN</strong></p><p style="margin: 0px 80px 16px;">
+The caller can neither tether nor untether the
+<em>source</em>
+pipe's thread to the caller's thread because it is tethered presently
+to some other thread than that of the caller.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_KILLED</strong></p><p style="margin: 0px 80px 16px;">
+The
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>
+function was interrupted because the caller's thread was killed.
+It may have been killed directly with
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>
+or
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>
+or as a consequence of a thread to which it is tethered
+being killed or terminating.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">ENOMEM</strong></p><p style="margin: 0px 80px 16px;">
+Available memory is insufficient for
+all updates necessary to
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>.
+</p>
+<p style="margin: 0px 40px 16px;">
+Various undocumented error codes within the range of
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MIN_ERR</strong>
+to
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MAX_ERR</strong>
+might also be reported for developer diagnostics if internal
+consistency checks fail. These codes are not actionable by users
+but may be helpful in bug reports.
+</p>
+<h6 style="color: #ff5c5c;">SEE ALSO</h6>
+<p style="margin: 0px 40px 16px;">
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>,
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>,
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>,
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>,
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>,
+<a class="font-monospace link-light" href="nthm_truncate.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate</a>,
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>,
+<a class="font-monospace link-light" href="nthm_truncated.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncated</a>,
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>,
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>,
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>,
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>,
+<a class="font-monospace link-light" href="nthm_killed.html" style="color: #5c76ff;text-decoration: inherit">nthm_killed</a>,
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>,
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>,
+<a class="font-monospace link-light" href="nthm_strerror.html" style="color: #5c76ff;text-decoration: inherit">nthm_strerror</a>,
+<a class="font-monospace link-light" href="nthm_busy.html" style="color: #5c76ff;text-decoration: inherit">nthm_busy</a>,
+<strong class="font-monospace" style="color: #45b74a;">pthreads</strong> (7),
+<a class="font-monospace link-light" href="nthm_sync.html" style="color: #5c76ff;text-decoration: inherit">nthm_sync</a>
+</p>
+<h6 style="color: #ff5c5c;">AUTHOR</h6>
+<p style="margin: 0px 40px 16px;">
+Dennis Furey 
+(<a class="font-monospace link-light" href="mailto:milonga@delayinsensitive.com" style="color: #5c76ff;text-decoration: inherit;">milonga@delayinsensitive.com</a>)
+</p>
+<div class="row" style="height: 32px;padding: 20px 0px;"><div class="col-md-4"><h5 style="color: var(--bs-gray);">NTHM VERSION 0.10.6</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">April 28, 2022</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_TETHER (3)</h5></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" style="background: var(--bs-dark);">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<title></title>
+</head>
+<body style="background-color: var(--bs-dark);color: var(--bs-white);margin: 40px 0px;">
+<div class="container" style="/*background: var(--bs-gradient);*/">
+<div class="row">
+<div class="col-md-4" style="height: 0px;"><h5 style="color: var(--bs-gray);">NTHM_READ (3)</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">NTHM MANUAL</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_READ (3)</h5></div>
+</div><div><p></p></div>
+<h6 style="color: #ff5c5c;">NAME</h6>
+<p style="margin: 0px 40px 16px;">
+nthm_read - read a result from a pipe and reclaim the pipe
+</p>
+<h6 style="color: #ff5c5c;">SYNOPSIS</h6>
+<p style="margin: 0px 40px 16px;">
+#include &lt;nthm/nthm.h&gt;
+</p><p style="margin: 0px 40px 16px;">
+void *
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+(
+<strong class="font-monospace" style="color: #45b74a;">nthm_pipe</strong>
+<em>source</em>
+, int
+<em>*err</em>
+)
+</p>
+<h6 style="color: #ff5c5c;">DESCRIPTION</h6>
+<p style="margin: 0px 40px 16px;">
+The
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+function
+is used for collecting the results computed in threads created by
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>.
+The
+<em>source</em>
+parameter should be an
+<strong class="font-monospace" style="color: #45b74a;">nthm_pipe</strong>
+returned from a prior call to
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+or
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>.
+</p>
+<p style="margin: 0px 40px 16px;">
+If the pipe's thread is still running when
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+is called, the caller is blocked until the thread finishes.
+If the thread has finished running beforehand, then
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+immediately reads its return value and returns it to the caller.
+</p>
+<p style="margin: 0px 40px 16px;">
+Pipes returned by
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+are always readable immediately although
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+itself may sometimes block.
+Applications can check whether a call to
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+would block by polling
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>
+with the same
+<em>source,</em>
+and can check whether
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+would block by polling
+<a class="font-monospace link-light" href="nthm_busy.html" style="color: #5c76ff;text-decoration: inherit">nthm_busy</a>.
+</p>
+<p style="margin: 0px 40px 16px;">
+The
+<em>source</em>
+parameter is deallocated upon return from
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>.
+Any subsequent reference to it has undefined effects.
+</p>
+<h6 style="color: #ff5c5c;">RETURN VALUE</h6>
+<p style="margin: 0px 40px 16px;">
+If
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+does not succeed, it returns a NULL value.
+</p>
+<p style="margin: 0px 40px 16px;">
+If it succeeds, then it
+returns the result computed by the application code in the pipe's
+thread, which may be NULL or non-NULL depending on the application.
+</p>
+<p style="margin: 0px 40px 16px;">
+For well-behaved applications, NULL return values can be disambiguated by
+the error code assigned to the
+<em>*err</em>
+parameter.
+</p>
+<h6 style="color: #ff5c5c;">ERRORS</h6>
+<p style="margin: 0px 40px 16px;">
+If
+<em>*err</em>
+is zero on entry and
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+succeeds, then
+<em>*err</em>
+is set by the application code whose pipe has been read.  If the
+application returns a NULL value and also sets
+<em>*err</em>
+to a non-zero value, it can
+avoid giving the impression that
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+has not succeeded by using error codes that differ from those
+listed below and any within the range of
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MIN_ERR</strong>
+to
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MAX_ERR</strong>.
+</p>
+<p style="margin: 0px 40px 16px;">
+If
+<em>*err</em>
+is non-zero on entry, then
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+leaves it unchanged. Any error status
+reported by the application is
+inaccessible in this case although
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+still returns the application code's return value if successful.
+</p>
+<p style="margin: 0px 40px 16px;">
+If
+<em>*err</em>
+is zero on entry and
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+does not succeed,
+then it may set
+<em>*err</em>
+to one of the following codes for the reasons noted.
+</p>
+<p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_NULPIP</strong></p><p style="margin: 0px 80px 16px;">
+The
+<em>source</em>
+parameter is a NULL pointer.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_INVPIP</strong></p><p style="margin: 0px 80px 16px;">
+The
+<em>source</em>
+parameter is not a NULL pointer but points to an invalid or corrupted
+pipe, or points nowhere in particular but fortunately did not cause a
+segfault.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_NOTDRN</strong></p><p style="margin: 0px 80px 16px;">
+The
+<em>source</em>
+pipe is not safely readable because the caller's thread is not its
+"drain", which can happen only if either
+<em>source</em>
+was opened in a separate thread from the caller and not untethered
+from it, or if it was opened in the same thread but in an enclosing
+scope as determined by
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_KILLED</strong></p><p style="margin: 0px 80px 16px;">
+Reading was interrupted because the caller's thread was killed with
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>
+or
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_XSCOPE</strong></p><p style="margin: 0px 80px 16px;">
+The application code running in the thread of the
+<em>source</em>
+pipe  entered at least
+one scope by
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+without exiting it by
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>.
+This error is only a warning because
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>
+behaves in other respects as if the application code had exited the
+relevant scopes immediately prior to returning. As usual, unread pipes
+opened within any enclosed scopes are left running untethered rather
+than being killed when the scopes are exited. If this behavior is not
+intended, then the application code should be modified accordingly.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">ENOMEM</strong></p><p style="margin: 0px 80px 16px;">
+There is insufficient memory to read from a pipe.
+</p>
+<p style="margin: 0px 40px 16px;">
+Various undocumented error codes within the range of
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MIN_ERR</strong>
+to
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MAX_ERR</strong>
+might also be reported for developer diagnostics if internal
+consistency checks fail. These codes are not actionable by users
+but may be helpful in bug reports.
+</p>
+<h6 style="color: #ff5c5c;">SEE ALSO</h6>
+<p style="margin: 0px 40px 16px;">
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>,
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>,
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>,
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>,
+<a class="font-monospace link-light" href="nthm_truncate.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate</a>,
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>,
+<a class="font-monospace link-light" href="nthm_truncated.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncated</a>,
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>,
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>,
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>,
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>,
+<a class="font-monospace link-light" href="nthm_killed.html" style="color: #5c76ff;text-decoration: inherit">nthm_killed</a>,
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>,
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>,
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>,
+<a class="font-monospace link-light" href="nthm_strerror.html" style="color: #5c76ff;text-decoration: inherit">nthm_strerror</a>,
+<a class="font-monospace link-light" href="nthm_busy.html" style="color: #5c76ff;text-decoration: inherit">nthm_busy</a>,
+<strong class="font-monospace" style="color: #45b74a;">pthreads</strong> (7),
+<a class="font-monospace link-light" href="nthm_sync.html" style="color: #5c76ff;text-decoration: inherit">nthm_sync</a>
+</p>
+<h6 style="color: #ff5c5c;">AUTHOR</h6>
+<p style="margin: 0px 40px 16px;">
+Dennis Furey 
+(<a class="font-monospace link-light" href="mailto:milonga@delayinsensitive.com" style="color: #5c76ff;text-decoration: inherit;">milonga@delayinsensitive.com</a>)
+</p>
+<div class="row" style="height: 32px;padding: 20px 0px;"><div class="col-md-4"><h5 style="color: var(--bs-gray);">NTHM VERSION 0.10.6</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">April 28, 2022</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_READ (3)</h5></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>

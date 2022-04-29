@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" style="background: var(--bs-dark);">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<title></title>
+</head>
+<body style="background-color: var(--bs-dark);color: var(--bs-white);margin: 40px 0px;">
+<div class="container" style="/*background: var(--bs-gradient);*/">
+<div class="row">
+<div class="col-md-4" style="height: 0px;"><h5 style="color: var(--bs-gray);">NTHM_ENTER_SCOPE (3)</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">NTHM MANUAL</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_ENTER_SCOPE (3)</h5></div>
+</div><div><p></p></div>
+<h6 style="color: #ff5c5c;">NAME</h6>
+<p style="margin: 0px 40px 16px;">
+nthm_enter_scope - select only from subsequently opened pipes
+</p><p style="margin: 0px 40px 16px;">
+nthm_exit_scope - allow selection of previously opened pipes
+</p>
+<h6 style="color: #ff5c5c;">SYNOPSIS</h6>
+<p style="margin: 0px 40px 16px;">
+#include &lt;nthm/nthm.h&gt;
+</p><p style="margin: 0px 40px 16px;">
+int
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+(
+int
+<em>*err</em>
+)
+</p><p style="margin: 0px 40px 16px;">
+int
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>
+(
+int
+<em>*err</em>
+)
+</p>
+<h6 style="color: #ff5c5c;">DESCRIPTION</h6>
+<p style="margin: 0px 40px 16px;">
+These functions are an advanced feature of
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>
+whose understanding depends on an understanding of
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+and other functions. See the
+NOTES
+section below for intended use cases.
+</p>
+<p style="margin: 0px 40px 16px;">
+Normally
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+can choose any pipe tethered to the caller's thread, but
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+can restrict it to specific pipes.
+</p>
+<ul style="margin: 0px 40px 16px;"><li>
+If
+there are open pipes when
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+is called, and more pipes are opened afterwards, then
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+chooses from among only those latter pipes and ignores the former.
+If the latter are busy, then
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+blocks though the former may be ready.
+If the latter are absent, then
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+returns NULL though the former may exist.
+</li><li>
+When
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>
+is called, pipes opened before the previous call to
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+can be selected again by
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>.
+</li><li>
+Any remaining pipes opened between a call to
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+and the next call to
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>
+are untethered thereafter from the caller's thread
+and hence ignored by
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>.
+However, their threads can continue to execute and
+be readable as normal.
+</li></ul>
+<p style="margin: 0px 40px 16px;">
+In more general usage, these functions can effect a stack-like
+configuration of scopes.
+</p>
+<ul style="margin: 0px 40px 16px;"><li>
+Each call to
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+pushes a new scope, hiding all pipes opened previously.
+</li><li>
+Each call to
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>
+pops a scope, restoring visibility to pipes opened just prior to the
+matching push but still hiding those opened before the previous
+unmatched push, if any.
+</li></ul>
+<p style="margin: 0px 40px 16px;">
+These functions also affect
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>,
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>,
+and
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>.
+They behave consistently with
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>.
+</p>
+<ul style="margin: 0px 40px 16px;"><li>
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>
+returns a non-zero value if
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+would block at the point where
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>
+is called when scopes are taken into account.
+</li><li>
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>
+and
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>
+affect only the pipes that have been opened since the most recent call
+to
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+not matched by a call to
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>.
+</li></ul>
+<p style="margin: 0px 40px 16px;">
+The functions
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>,
+<a class="font-monospace link-light" href="nthm_truncate.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate</a>,
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>,
+and
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>
+are also affected. Attempts to apply them to pipes that are
+tethered but not selectable by the above criteria cause the error
+status of
+<strong class="font-monospace" style="color: #45b74a;">NTHM_NOTDRN</strong>,
+just as if the pipes had been tethered to a different thread.
+</p>
+<h6 style="color: #ff5c5c;">RETURN VALUE</h6>
+<p style="margin: 0px 40px 16px;">
+A non-zero value is returned by
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+and
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+if they succeed.
+</p>
+<h6 style="color: #ff5c5c;">ERRORS</h6>
+<p style="margin: 0px 40px 16px;">
+</p>
+<p style="margin: 0px 40px 16px;">
+If
+<em>*err</em>
+is non-zero on entry, then
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+and
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>
+leave it unchanged. If
+<em>*err</em>
+is zero on entry and non-zero on exit, it may have been assigned one
+of the following values for the reasons noted, and the requested
+operation will not have completed.
+</p>
+<p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_UNDFLO</strong></p><p style="margin: 0px 80px 16px;">
+A scope underflow status is reported whenever
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>
+is called more times than
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_KILLED</strong></p><p style="margin: 0px 80px 16px;">
+The
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>
+function was interrupted because the caller's thread was killed.
+It may have been killed directly with
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>
+or
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>
+or as a consequence of a thread to which it is tethered
+being killed or terminating.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">ENOMEM</strong></p><p style="margin: 0px 80px 16px;">
+Available memory is insufficient.
+</p>
+<p style="margin: 0px 40px 16px;">
+Various undocumented error codes within the range of
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MIN_ERR</strong>
+to
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MAX_ERR</strong>
+might also be reported for developer diagnostics if internal
+consistency checks fail. These codes are not actionable by users
+but may be helpful in bug reports.
+</p>
+<h6 style="color: #ff5c5c;">EXAMPLES</h6>
+<p style="margin: 0px 40px 16px;">
+This example illustrates pipes opened in two scopes with
+explanations of what to expect.
+</p>
+<div style="margin: 0px 80px 12px;padding:20px;color:rgb(31,255,63);background-color:rgb(0,0,0)"><pre>
+p1 = nthm_open (&f1, &x1, err);
+p2 = nthm_open (&f2, &x2, err);
+
+nthm_enter_scope (err);
+
+   q1 = nthm_open (&g1, &y1, err);
+   q2 = nthm_open (&g2, &y2, err);
+
+   // A is guaranteed to be read from either q1 or q2.
+
+   A = nthm_read (nthm_select (err), err);
+
+nthm_exit_scope (err);
+
+// The other of q1 or q2 is untethered at this
+// point but may continue to run. B is guaranteed
+// to be read from either p1 or p2.
+
+B = nthm_read (nthm_select (err), err);</pre></div>
+<p style="margin: 0px 40px 16px;">
+Some points to note about this example are as follows.
+</p>
+<ul style="margin: 0px 40px 16px;"><li>
+The first call to
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+blocks if neither of q1 or q2 is ready, regardless of p1 and p2 being
+ready or not.
+</li><li>
+If there were more than two calls to
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+before
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>,
+the third and subsequent calls would return a NULL pipe despite the
+presence of p1 and p2.
+</li><li>
+After the call to
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>,
+p1 and p2 are selectable as normal.
+Although one of q1 or q2 is still open,
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>
+ignores it.
+</li><li>
+A scope once exited can not be re-entered. If another scope were
+entered in a continuation of this example, the remaining unread
+pipe assigned to q1 or q2 still would not be selectable in it.
+</li></ul>
+<p style="margin: 0px 40px 16px;">
+The next example demonstrates multiple nested scopes.
+</p>
+<div style="margin: 0px 80px 12px;padding:20px;color:rgb(31,255,63);background-color:rgb(0,0,0)"><pre>
+a: nthm_enter_scope (err);       // outer scope
+
+// Pipes opened here are selectable only here,
+// between c: and d:, and between e: and f:.
+
+b: nthm_enter_scope (err);       // nested scope
+
+   // Pipes opened here are selectable nowhere else.
+
+c: nthm_exit_scope (err);        // matches b:
+
+// Pipes opened here are also selectable between
+// e: and f:.
+
+d: nthm_enter_scope (err);       // another nested scope
+
+   // Pipes opened here are selectable nowhere else.
+
+e: nthm_exit_scope (err);        // matches d:
+
+// back in the outer scope
+
+f: nthm_exit_scope (err);        // matches a:</pre></div>
+<p style="margin: 0px 40px 16px;">
+</p>
+<h6 style="color: #ff5c5c;">NOTES</h6>
+<p style="margin: 0px 40px 16px;">
+These functions can be helpful for library routines needing to operate
+on their own locally opened pipes while other pipes opened by the main
+application or other library routines continue in the background. A
+scope prevents the library routine from mistakenly selecting or
+interfering with pipes opened outside it.
+</p>
+<p style="margin: 0px 40px 16px;">
+If a routine runs in a separate thread from the main application,
+and that thread is created directly
+by
+<strong class="font-monospace" style="color: #45b74a;">pthreads</strong>
+primitives rather than as a side-effect of
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>,
+then all pipes it opens with
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+are automatically separate from those of the application without need
+of scopes.
+</p>
+<h6 style="color: #ff5c5c;">SEE ALSO</h6>
+<p style="margin: 0px 40px 16px;">
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>,
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>,
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>,
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>,
+<a class="font-monospace link-light" href="nthm_truncate.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate</a>,
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>,
+<a class="font-monospace link-light" href="nthm_truncated.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncated</a>,
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>,
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>,
+<a class="font-monospace link-light" href="nthm_killed.html" style="color: #5c76ff;text-decoration: inherit">nthm_killed</a>,
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>,
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>,
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>,
+<a class="font-monospace link-light" href="nthm_strerror.html" style="color: #5c76ff;text-decoration: inherit">nthm_strerror</a>,
+<a class="font-monospace link-light" href="nthm_busy.html" style="color: #5c76ff;text-decoration: inherit">nthm_busy</a>,
+<strong class="font-monospace" style="color: #45b74a;">pthreads</strong> (7),
+<a class="font-monospace link-light" href="nthm_sync.html" style="color: #5c76ff;text-decoration: inherit">nthm_sync</a>
+</p>
+<h6 style="color: #ff5c5c;">AUTHOR</h6>
+<p style="margin: 0px 40px 16px;">
+Dennis Furey 
+(<a class="font-monospace link-light" href="mailto:milonga@delayinsensitive.com" style="color: #5c76ff;text-decoration: inherit;">milonga@delayinsensitive.com</a>)
+</p>
+<div class="row" style="height: 32px;padding: 20px 0px;"><div class="col-md-4"><h5 style="color: var(--bs-gray);">NTHM VERSION 0.10.6</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">April 28, 2022</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_ENTER_SCOPE (3)</h5></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>

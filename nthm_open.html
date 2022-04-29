@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" style="background: var(--bs-dark);">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<title></title>
+</head>
+<body style="background-color: var(--bs-dark);color: var(--bs-white);margin: 40px 0px;">
+<div class="container" style="/*background: var(--bs-gradient);*/">
+<div class="row">
+<div class="col-md-4" style="height: 0px;"><h5 style="color: var(--bs-gray);">NTHM_OPEN (3)</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">NTHM MANUAL</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_OPEN (3)</h5></div>
+</div><div><p></p></div>
+<h6 style="color: #ff5c5c;">NAME</h6>
+<p style="margin: 0px 40px 16px;">
+nthm_open - start a new thread and return a pipe from it
+</p>
+<h6 style="color: #ff5c5c;">SYNOPSIS</h6>
+<p style="margin: 0px 40px 16px;">
+#include &lt;nthm/nthm.h&gt;
+</p><p style="margin: 0px 40px 16px;">
+<strong class="font-monospace" style="color: #45b74a;">nthm_pipe</strong>
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+(
+<strong class="font-monospace" style="color: #45b74a;">nthm_worker</strong>
+<em>&operator</em>
+, void
+<em>*operand</em>
+, int
+<em>*err</em>
+)
+</p>
+<h6 style="color: #ff5c5c;">DESCRIPTION</h6>
+<p style="margin: 0px 40px 16px;">
+The
+<em>operator</em>
+argument is a function that takes a
+<strong class="font-monospace" style="color: #45b74a;">void</strong>
+pointer and an
+<strong class="font-monospace" style="color: #45b74a;">int</strong>
+pointer and returns a
+<strong class="font-monospace" style="color: #45b74a;">void</strong>
+pointer.  Compatible functions can be cast as such by the
+<strong class="font-monospace" style="color: #45b74a;">nthm_worker</strong>
+type alias. The function
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+passes the parameters
+<em>operand</em>
+and
+<em>err</em>
+to
+<em>operator</em>
+as if the caller had invoked
+</p><p style="margin: 0px 40px 16px;">
+<strong class="font-monospace" style="color: #45b74a;">retval</strong>
+=
+<em>operator</em>
+(
+<em>operand</em>
+,
+<em>err</em>
+)
+</p><p style="margin: 0px 40px 16px;">
+but runs
+<em>operator</em>
+in a separate thread from the caller.
+On 32-bit systems, the
+usable stack size allocated to the created thread is limited to
+<strong class="font-monospace" style="color: #45b74a;">NTHM_STACK_MIN</strong>
+or roughly 16 Kbytes with a view to conserving virtual address
+space. On 64-bit systems, the default stack size (typically 8MB) is
+reserved but not physically used unless the thread's stack actually
+grows to that size.
+</p>
+<p style="margin: 0px 40px 16px;">
+When
+<em>operator</em>
+returns its result, the thread created for it exits.
+The
+<em>operator</em>
+function must 
+<strong class="font-monospace" style="color: #45b74a;"></strong>*not*
+call
+<strong class="font-monospace" style="color: #45b74a;">pthread_exit</strong>
+explicitly. If
+<em>operator</em>
+assigns an error code to
+<em>*err,</em>
+the error code
+is available to the reader of
+the pipe returned by
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>.
+To avoid ambiguity,
+<em>operator</em>
+should avoid assigning error codes
+that clash with
+those noted below.
+</p>
+<h6 style="color: #ff5c5c;">RETURN VALUE</h6>
+<p style="margin: 0px 40px 16px;">
+If
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+does not succeed, it returns NULL and
+<em>operator</em>
+is not run.
+</p>
+<p style="margin: 0px 40px 16px;">
+If
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+succeeds, it returns a value of type
+<strong class="font-monospace" style="color: #45b74a;">nthm_pipe</strong>
+that may be used in subsequent calls to
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>,
+<a class="font-monospace link-light" href="nthm_truncate.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate</a>,
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>,
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>,
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>,
+and
+<a class="font-monospace link-light" href="nthm_busy.html" style="color: #5c76ff;text-decoration: inherit">nthm_busy</a>.
+For example,
+</p>
+<div style="margin: 0px 80px 12px;padding:20px;color:rgb(31,255,63);background-color:rgb(0,0,0)"><pre>
+my_pipe = nthm_open ((nthm_worker) &my_function, &some_data, err);
+// ...
+retval = nthm_read (my_pipe, err);</pre></div>
+<p style="margin: 0px 40px 16px;">
+</p>
+<h6 style="color: #ff5c5c;">ERRORS</h6>
+<p style="margin: 0px 40px 16px;">
+If
+<em>*err</em>
+is zero on entry and
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+does not succeed, it
+assigns a non-zero number to
+<em>*err.</em>
+Otherwise, it leaves 
+<em>*err</em>
+unchanged.
+Negative numbers from
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MIN_ERR</strong>
+to
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MAX_ERR</strong>
+report internal errors.
+Internal errors may be due to memory corruption,
+misuse of the API, or a bug in
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>.
+(Bug reports are welcome.)
+Positive numbers report POSIX
+errors.
+The following specific errors are possible.
+</p>
+<p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">EAGAIN</strong></p><p style="margin: 0px 80px 16px;">
+Resources or permission are insufficient to create a thread.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">ENOMEM</strong></p><p style="margin: 0px 80px 16px;">
+There is insufficient memory for a new thread or metadata.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_KILLED</strong></p><p style="margin: 0px 80px 16px;">
+No new threads may be created because the caller's thread has been killed.
+The thread may have been killed directly by its creator with
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>
+or
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>
+or indirectly due to the creator being killed or exiting.
+</p>
+<h6 style="color: #ff5c5c;">NOTES</h6>
+<p style="margin: 0px 40px 16px;">
+On 64-bit systems, use this command to display the default stack size in Kbytes.
+</p><p style="margin: 0px 40px 16px;">
+<strong class="font-monospace" style="color: #45b74a;">ulimit</strong>
+-s
+</p>
+<h6 style="color: #ff5c5c;">SEE ALSO</h6>
+<p style="margin: 0px 40px 16px;">
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>,
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>,
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>,
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>,
+<a class="font-monospace link-light" href="nthm_truncate.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate</a>,
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>,
+<a class="font-monospace link-light" href="nthm_truncated.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncated</a>,
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>,
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>,
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>,
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>,
+<a class="font-monospace link-light" href="nthm_killed.html" style="color: #5c76ff;text-decoration: inherit">nthm_killed</a>,
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>,
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>,
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>,
+<a class="font-monospace link-light" href="nthm_busy.html" style="color: #5c76ff;text-decoration: inherit">nthm_busy</a>,
+<a class="font-monospace link-light" href="nthm_sync.html" style="color: #5c76ff;text-decoration: inherit">nthm_sync</a>,
+<a class="font-monospace link-light" href="nthm_strerror.html" style="color: #5c76ff;text-decoration: inherit">nthm_strerror</a>,
+<strong class="font-monospace" style="color: #45b74a;">pthreads</strong> (7),
+<strong class="font-monospace" style="color: #45b74a;">ulimit</strong> (1)
+</p>
+<h6 style="color: #ff5c5c;">AUTHOR</h6>
+<p style="margin: 0px 40px 16px;">
+Dennis Furey 
+(<a class="font-monospace link-light" href="mailto:milonga@delayinsensitive.com" style="color: #5c76ff;text-decoration: inherit;">milonga@delayinsensitive.com</a>)
+</p>
+<div class="row" style="height: 32px;padding: 20px 0px;"><div class="col-md-4"><h5 style="color: var(--bs-gray);">NTHM VERSION 0.10.6</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">April 28, 2022</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_OPEN (3)</h5></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>

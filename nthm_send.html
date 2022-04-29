@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" style="background: var(--bs-dark);">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<title></title>
+</head>
+<body style="background-color: var(--bs-dark);color: var(--bs-white);margin: 40px 0px;">
+<div class="container" style="/*background: var(--bs-gradient);*/">
+<div class="row">
+<div class="col-md-4" style="height: 0px;"><h5 style="color: var(--bs-gray);">NTHM_SEND (3)</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">NTHM MANUAL</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_SEND (3)</h5></div>
+</div><div><p></p></div>
+<h6 style="color: #ff5c5c;">NAME</h6>
+<p style="margin: 0px 40px 16px;">
+nthm_send - start a new thread with no return value needed
+</p>
+<h6 style="color: #ff5c5c;">SYNOPSIS</h6>
+<p style="margin: 0px 40px 16px;">
+#include &lt;nthm/nthm.h&gt;
+</p><p style="margin: 0px 40px 16px;">
+int
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+(
+<strong class="font-monospace" style="color: #45b74a;">nthm_slacker</strong>
+<em>&mutator</em>
+, void *
+<em>operand</em>
+, int *
+<em>err</em>
+)
+</p>
+<h6 style="color: #ff5c5c;">DESCRIPTION</h6>
+<p style="margin: 0px 40px 16px;">
+The
+<em>mutator</em>
+argument is a pointer to a function that takes a
+void
+pointer and has no return value.
+Compatible function pointers can be cast as such by the
+<strong class="font-monospace" style="color: #45b74a;">nthm_slacker</strong>
+type alias. The function
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+passes
+<em>operand</em>
+to
+<em>mutator</em>
+as if the caller had invoked
+</p><p style="margin: 0px 40px 16px;">
+<em>mutator</em>
+(
+<em>operand</em>
+);
+</p><p style="margin: 0px 40px 16px;">
+but runs
+<em>mutator</em>
+in a separate thread from the caller.
+On 32-bit systems, the
+usable stack size allocated to the created thread is limited to
+<strong class="font-monospace" style="color: #45b74a;">NTHM_STACK_MIN</strong>
+or roughly 16 Kbytes with a view to conserving virtual address
+space. On 64-bit systems, the default stack size (typically 8MB) is
+reserved but not physically used unless the thread's stack actually
+grows to that size.
+</p>
+<p style="margin: 0px 40px 16px;">
+The
+<em>mutator</em>
+function must not call
+<strong class="font-monospace" style="color: #45b74a;">pthread_exit</strong>.
+Its thread will terminate automatically after the function returns.
+</p>
+<h6 style="color: #ff5c5c;">RETURN VALUE</h6>
+<p style="margin: 0px 40px 16px;">
+Zero is returned if
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+is unsuccessful for any reason. A non-zero value is returned otherwise.
+</p>
+<h6 style="color: #ff5c5c;">ERRORS</h6>
+<p style="margin: 0px 40px 16px;">
+The
+<em>*err</em>
+parameter is assigned a non-zero error code by
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+if it is zero on entry and if an error is detected,
+but is left unchanged otherwise. If
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+detects an error, then the
+<em>mutator</em>
+function is not executed.
+These error codes
+among others are possible for the reasons shown.
+</p>
+<p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">EAGAIN</strong></p><p style="margin: 0px 80px 16px;">
+Resources or permission are insufficient to create a thread.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">ENOMEM</strong></p><p style="margin: 0px 80px 16px;">
+There is insufficient memory for a new thread or metadata.
+</p><p style="margin: -5px 40px -3px;"><strong class="font-monospace" style="color: #45b74a;">NTHM_KILLED</strong></p><p style="margin: 0px 80px 16px;">
+No new threads may be created because the caller's thread has been killed.
+The thread may have been killed directly by its creator with
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>
+or
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>
+or indirectly due to the creator being killed or exiting.
+</p>
+<p style="margin: 0px 40px 16px;">
+Other values corresponding to POSIX errors or
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>
+internal errors in the range of
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MIN_ERR</strong>
+to
+<strong class="font-monospace" style="color: #45b74a;">-NTHM_MAX_ERR</strong>
+might also be assigned. Internal errors may indicate memory
+corruption, misuse of the API, or a bug in
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>.
+Bug reports including error codes are welcome.
+</p>
+<h6 style="color: #ff5c5c;">EXAMPLE</h6>
+<p style="margin: 0px 40px 16px;">
+An application program containing this fragment sleeps
+for at least one second after a successful call to
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+despite the main thread exiting immediately thereafter.
+</p>
+<div style="margin: 0px 80px 12px;padding:20px;color:rgb(31,255,63);background-color:rgb(0,0,0)"><pre>
+void f (void *x)
+{
+  sleep (1);
+}
+
+// ... main thread below
+
+err = 0;
+nthm_send ((nthm_slacker) &f, x, &err);
+if (err)
+   printf ("%s\\n", nthm_strerror (err));
+exit (err ? EXIT_FAILURE : EXIT_SUCCESS);</pre></div>
+<p style="margin: 0px 40px 16px;">
+</p>
+<h6 style="color: #ff5c5c;">NOTES</h6>
+<p style="margin: 0px 40px 16px;">
+This function is an alternative to the standard
+<strong class="font-monospace" style="color: #45b74a;">pthread_create</strong>
+function that is less configurable but behaves more in line with
+expectations.
+</p>
+<ul style="margin: 0px 40px 16px;"><li>
+Normally if an application creates a thread with
+<strong class="font-monospace" style="color: #45b74a;">pthread_create</strong>
+and then exits without joining it, there is a chance of the thread never
+starting due to a race. A synchronization protocol used behind the
+scenes by
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+ensures that the thread starts without further intervention.
+</li><li>
+An application that exits without joining a long-running thread 
+created by
+<strong class="font-monospace" style="color: #45b74a;">pthread_create</strong>
+incurs a risk of the thread continuing to run and mistakenly
+continuing to rely on resources that the application has released. It
+also risks prematurely indicating to the user that it
+has finished. Threads created by
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+(and by
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>
+as well) benefit from a protocol implemented behind the scenes
+that postpones the application's exit until they have yielded.
+</li></ul>
+<p style="margin: 0px 40px 16px;">
+The best use of
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+is for background operations whose completion is
+not a prerequisite for anything but termination, such as reclaiming
+storage or closing sockets and files, and that do not use any resources
+held by the main application thread.
+</p>
+<p style="margin: 0px 40px 16px;">
+If a thread created by
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+needs access to a resource planned to be released in the main thread,
+such as an open file handle or a pointer to the heap, then the code
+that releases it should be run either in an exit routine installed by
+the standard
+<strong class="font-monospace" style="color: #45b74a;">atexit</strong> (3)
+utility prior to the first call to any
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>
+library function, or after a call to 
+<a class="font-monospace link-light" href="nthm_sync.html" style="color: #5c76ff;text-decoration: inherit">nthm_sync</a>.
+Otherwise, there is no assurance of the resource persisting
+until the thread needs it.
+</p>
+<p style="margin: 0px 40px 16px;">
+Threads created by
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+are not affected by
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>
+or
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>
+except insofar
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>
+fails when called in a killed thread. If
+<a class="font-monospace link-light" href="nthm_killed.html" style="color: #5c76ff;text-decoration: inherit">nthm_killed</a>
+or
+<a class="font-monospace link-light" href="nthm_truncated.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncated</a>
+is called in the context of a thread created by
+<a class="font-monospace link-light" href="nthm_send.html" style="color: #5c76ff;text-decoration: inherit">nthm_send</a>,
+it will return zero.
+</p>
+<p style="margin: 0px 40px 16px;">
+On 64-bit systems, use this command to display the default stack size in Kbytes.
+</p><p style="margin: 0px 40px 16px;">
+<strong class="font-monospace" style="color: #45b74a;">ulimit</strong>
+-s
+</p>
+<h6 style="color: #ff5c5c;">SEE ALSO</h6>
+<p style="margin: 0px 40px 16px;">
+<a class="font-monospace link-light" href="nthm.html" style="color: #5c76ff;text-decoration: inherit">nthm</a>,
+<a class="font-monospace link-light" href="nthm_open.html" style="color: #5c76ff;text-decoration: inherit">nthm_open</a>,
+<a class="font-monospace link-light" href="nthm_read.html" style="color: #5c76ff;text-decoration: inherit">nthm_read</a>,
+<a class="font-monospace link-light" href="nthm_select.html" style="color: #5c76ff;text-decoration: inherit">nthm_select</a>,
+<a class="font-monospace link-light" href="nthm_truncate.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate</a>,
+<a class="font-monospace link-light" href="nthm_truncate_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncate_all</a>,
+<a class="font-monospace link-light" href="nthm_truncated.html" style="color: #5c76ff;text-decoration: inherit">nthm_truncated</a>,
+<a class="font-monospace link-light" href="nthm_enter_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_enter_scope</a>,
+<a class="font-monospace link-light" href="nthm_exit_scope.html" style="color: #5c76ff;text-decoration: inherit">nthm_exit_scope</a>,
+<a class="font-monospace link-light" href="nthm_kill.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill</a>,
+<a class="font-monospace link-light" href="nthm_kill_all.html" style="color: #5c76ff;text-decoration: inherit">nthm_kill_all</a>,
+<a class="font-monospace link-light" href="nthm_killed.html" style="color: #5c76ff;text-decoration: inherit">nthm_killed</a>,
+<a class="font-monospace link-light" href="nthm_untether.html" style="color: #5c76ff;text-decoration: inherit">nthm_untether</a>,
+<a class="font-monospace link-light" href="nthm_tether.html" style="color: #5c76ff;text-decoration: inherit">nthm_tether</a>,
+<a class="font-monospace link-light" href="nthm_blocked.html" style="color: #5c76ff;text-decoration: inherit">nthm_blocked</a>,
+<a class="font-monospace link-light" href="nthm_busy.html" style="color: #5c76ff;text-decoration: inherit">nthm_busy</a>,
+<a class="font-monospace link-light" href="nthm_sync.html" style="color: #5c76ff;text-decoration: inherit">nthm_sync</a>,
+<a class="font-monospace link-light" href="nthm_strerror.html" style="color: #5c76ff;text-decoration: inherit">nthm_strerror</a>,
+<strong class="font-monospace" style="color: #45b74a;">pthreads</strong> (7),
+<strong class="font-monospace" style="color: #45b74a;">ulimit</strong> (1),
+<strong class="font-monospace" style="color: #45b74a;">atexit</strong> (3)
+</p>
+<h6 style="color: #ff5c5c;">AUTHOR</h6>
+<p style="margin: 0px 40px 16px;">
+Dennis Furey 
+(<a class="font-monospace link-light" href="mailto:milonga@delayinsensitive.com" style="color: #5c76ff;text-decoration: inherit;">milonga@delayinsensitive.com</a>)
+</p>
+<div class="row" style="height: 32px;padding: 20px 0px;"><div class="col-md-4"><h5 style="color: var(--bs-gray);">NTHM VERSION 0.10.6</h5></div>
+<div class="col-md-4"><h5 class="text-center" style="color: var(--bs-gray);">April 28, 2022</h5></div>
+<div class="col-md-4"><h5 class="text-end" style="color: var(--bs-gray);">NTHM_SEND (3)</h5></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
